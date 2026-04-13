@@ -1,5 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS msclients_schema;
 CREATE SCHEMA IF NOT EXISTS msaccounts_schema;
+CREATE SCHEMA IF NOT EXISTS reportes_schema;
 
 -- Tabla persona
 CREATE TABLE IF NOT EXISTS msclients_schema.persona (
@@ -46,7 +47,63 @@ CREATE TABLE IF NOT EXISTS msaccounts_schema.movimientos (
 CREATE INDEX idx_movimientos_cuenta_id ON msaccounts_schema.movimientos(cuenta_id);
 CREATE INDEX idx_movimientos_fecha ON msaccounts_schema.movimientos(fecha);
 
+-- ---------------------------------------------------------------------------
+-- Read model ms-reportes (CQRS) — esquema dedicado reportes_schema
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS reportes_schema.reporte_cliente (
+    id UUID PRIMARY KEY,
+    cliente_id UUID NOT NULL,
+    nombre VARCHAR(255) NOT NULL,
+    identificacion VARCHAR(50) NOT NULL,
+    email VARCHAR(255),
+    telefono VARCHAR(50),
+    fecha_creacion TIMESTAMP NOT NULL,
+    fecha_actualizacion TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_reporte_cliente_cliente_id ON reportes_schema.reporte_cliente(cliente_id);
+
+CREATE TABLE IF NOT EXISTS reportes_schema.reporte_cuenta (
+    id UUID PRIMARY KEY,
+    cuenta_id UUID NOT NULL,
+    cliente_id UUID NOT NULL,
+    numero_cuenta VARCHAR(50) NOT NULL,
+    tipo VARCHAR(20) NOT NULL,
+    saldo_actual DECIMAL(19, 4) NOT NULL,
+    moneda VARCHAR(3) NOT NULL,
+    estado VARCHAR(20) NOT NULL,
+    fecha_creacion TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_reporte_cuenta_cliente_id ON reportes_schema.reporte_cuenta(cliente_id);
+
+CREATE TABLE IF NOT EXISTS reportes_schema.reporte_movimiento (
+    id UUID PRIMARY KEY,
+    movimiento_id UUID NOT NULL,
+    cuenta_id UUID NOT NULL,
+    cliente_id UUID NOT NULL,
+    tipo VARCHAR(20) NOT NULL,
+    monto DECIMAL(19, 4) NOT NULL,
+    saldo_posterior DECIMAL(19, 4) NOT NULL,
+    descripcion VARCHAR(500),
+    fecha TIMESTAMP NOT NULL,
+    fecha_procesamiento TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_reporte_movimiento_cliente_fecha ON reportes_schema.reporte_movimiento(cliente_id, fecha DESC);
+
+CREATE TABLE IF NOT EXISTS reportes_schema.processed_event (
+    event_id VARCHAR(100) PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    fecha_procesamiento TIMESTAMP NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_processed_event_fecha ON reportes_schema.processed_event(fecha_procesamiento);
+
 GRANT ALL ON SCHEMA msclients_schema TO banking_user;
 GRANT ALL ON SCHEMA msaccounts_schema TO banking_user;
+GRANT ALL ON SCHEMA reportes_schema TO banking_user;
 GRANT ALL ON ALL TABLES IN SCHEMA msclients_schema TO banking_user;
 GRANT ALL ON ALL TABLES IN SCHEMA msaccounts_schema TO banking_user;
+GRANT ALL ON ALL TABLES IN SCHEMA reportes_schema TO banking_user;

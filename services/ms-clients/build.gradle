@@ -91,3 +91,13 @@ configure(subprojects.findAll {
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 }
+
+// Evita colisión en Eclipse/VS Code Java al importar ms-clients junto a ms-accounts u otros (:application, :domain, etc.)
+subprojects { Project p ->
+    p.apply plugin: 'eclipse'
+    p.eclipse {
+        project {
+            name = "${rootProject.name}-${p.path.substring(1).replace(':', '-')}"
+        }
+    }
+}

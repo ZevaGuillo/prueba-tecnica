@@ -45,7 +45,7 @@ description: Task list for Account Report CQRS microservice implementation
 - [X] T007 Create ReporteMovimiento entity in services/ms-reportes/domain/src/main/java/.../model/ReporteMovimiento.java
 - [X] T008 Create ProcessedEvent entity in services/ms-reportes/domain/src/main/java/.../model/ProcessedEvent.java
 - [X] T009 [P] Configure JPA repositories for all entities in services/ms-reportes/infrastructure/src/main/java/.../repository/
-- [X] T010 Create schema initialization SQL in infra/init-reportes.sql
+- [X] T010 Create schema initialization SQL for read model in infra/init-schema.sql
 - [X] T011 Configure actuator endpoints and health checks
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel

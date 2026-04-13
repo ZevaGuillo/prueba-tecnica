@@ -58,3 +58,13 @@ configure(subprojects.findAll { it.name.contains('jpa') || it.name.contains('kaf
         testImplementation 'org.springframework.kafka:spring-kafka-test'
     }
 }
+
+// Evita colisión en Eclipse/VS Code Java: varios microservicios tienen subproyectos "application", "domain", etc.
+subprojects { Project p ->
+    p.apply plugin: 'eclipse'
+    p.eclipse {
+        project {
+            name = "${rootProject.name}-${p.path.substring(1).replace(':', '-')}"
+        }
+    }
+}
