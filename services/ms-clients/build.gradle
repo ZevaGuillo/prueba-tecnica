@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.3' apply false
+    id 'io.spring.dependency-management' version '1.1.4' apply false
+}
+
+description = 'ms-clients: Microservicio de gestión de clientes'
+
+// Configuración común para todos los submodules
+subprojects {
+    apply plugin: 'java'
+    
+    group = 'com.zevaguillo.banking'
+    version = '1.0.0'
+    
+    repositories {
+        mavenCentral()
+        maven {
+            url = 'https://packages.confluent.io/maven/'
+        }
+    }
+    
+    // Configuración Java común
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    
+    // Configuración de testing común
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+            showStandardStreams = false
+        }
+    }
+    
+    // Dependencias comunes a todos los proyectos
+    dependencies {
+        // Logging común
+        implementation 'org.slf4j:slf4j-api:2.0.9'
+        
+        // Testing común
+        testImplementation platform('org.junit:junit-bom:5.9.2')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testImplementation 'org.assertj:assertj-core:3.24.2'
+    }
+}
+
+// Configuraciones específicas por tipo de módulo
+configure(subprojects.findAll { it.name.contains('jpa') || it.name.contains('kafka') || it.name.contains('api-rest') || it.name.contains('app-service') }) {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-logging'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+}
