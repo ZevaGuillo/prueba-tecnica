@@ -1,1 +1,5 @@
 rootProject.name = 'ms-accounts'
+
+include 'domain'
+include 'application'
+include 'infrastructure'

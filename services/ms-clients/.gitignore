@@ -12,6 +12,8 @@ build/
 .project
 .classpath
 .settings/
+.factorypath
+bin/
 *.class
 
 # Logs
