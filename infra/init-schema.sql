@@ -20,6 +20,32 @@ CREATE TABLE IF NOT EXISTS msclients_schema.cliente (
     CONSTRAINT fk_cliente_persona FOREIGN KEY (identificacion) REFERENCES msclients_schema.persona(identificacion)
 );
 
+-- Tabla cuentas
+CREATE TABLE IF NOT EXISTS msaccounts_schema.cuentas (
+    cuenta_id VARCHAR(50) PRIMARY KEY,
+    numero_cuenta VARCHAR(50) UNIQUE NOT NULL,
+    tipo_cuenta VARCHAR(20),
+    saldo DOUBLE PRECISION,
+    estado VARCHAR(20),
+    cliente_id VARCHAR(50),
+    version INTEGER DEFAULT 0
+);
+
+-- Tabla movimientos
+CREATE TABLE IF NOT EXISTS msaccounts_schema.movimientos (
+    movimiento_id VARCHAR(50) PRIMARY KEY,
+    cuenta_id VARCHAR(50) NOT NULL,
+    tipo_movimiento VARCHAR(20),
+    valor DOUBLE PRECISION,
+    saldo_resultante DOUBLE PRECISION,
+    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    transaction_id VARCHAR(50) UNIQUE,
+    CONSTRAINT fk_movimientos_cuentas FOREIGN KEY (cuenta_id) REFERENCES msaccounts_schema.cuentas(cuenta_id)
+);
+
+CREATE INDEX idx_movimientos_cuenta_id ON msaccounts_schema.movimientos(cuenta_id);
+CREATE INDEX idx_movimientos_fecha ON msaccounts_schema.movimientos(fecha);
+
 GRANT ALL ON SCHEMA msclients_schema TO banking_user;
 GRANT ALL ON SCHEMA msaccounts_schema TO banking_user;
 GRANT ALL ON ALL TABLES IN SCHEMA msclients_schema TO banking_user;
