@@ -5,8 +5,10 @@ import com.banco.msclients.application.port.in.ObtenerPersonaUseCase;
 import com.banco.msclients.domain.model.Persona;
 import com.banco.msclients.infrastructure.rest.dto.PersonaRequest;
 import com.banco.msclients.infrastructure.rest.dto.PersonaResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/personas")
+@Validated
 public class PersonaController {
     
     private final CrearPersonaUseCase crearUseCase;
@@ -32,7 +35,7 @@ public class PersonaController {
      * POST /personas - Create a new persona
      */
     @PostMapping
-    public ResponseEntity<PersonaResponse> crear(@RequestBody PersonaRequest request) {
+    public ResponseEntity<PersonaResponse> crear(@Valid @RequestBody @Validated(PersonaRequest.Create.class) PersonaRequest request) {
         Persona persona = request.toDomain();
         Persona creada = crearUseCase.ejecutar(persona);
         return ResponseEntity.status(HttpStatus.CREATED).body(PersonaResponse.from(creada));

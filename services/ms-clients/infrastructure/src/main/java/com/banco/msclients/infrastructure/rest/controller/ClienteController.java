@@ -7,8 +7,10 @@ import com.banco.msclients.application.port.in.ObtenerClienteUseCase;
 import com.banco.msclients.domain.model.Cliente;
 import com.banco.msclients.infrastructure.rest.dto.ClienteRequest;
 import com.banco.msclients.infrastructure.rest.dto.ClienteResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,7 +42,7 @@ public class ClienteController {
      * POST /clientes - Create a new cliente
      */
     @PostMapping
-    public ResponseEntity<ClienteResponse> crear(@RequestBody ClienteRequest request) {
+    public ResponseEntity<ClienteResponse> crear(@Validated(ClienteRequest.Create.class) @RequestBody ClienteRequest request) {
         Cliente cliente = request.toDomain();
         Cliente creado = crearUseCase.ejecutar(cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(ClienteResponse.from(creado));
@@ -70,7 +72,7 @@ public class ClienteController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ClienteResponse> actualizar(@PathVariable String id, 
-                                                    @RequestBody ClienteRequest request) {
+                                                    @Validated(ClienteRequest.Update.class) @RequestBody ClienteRequest request) {
         Cliente actualizado = actualizarUseCase.ejecutar(id, request.toDomain());
         return ResponseEntity.ok(ClienteResponse.from(actualizado));
     }
