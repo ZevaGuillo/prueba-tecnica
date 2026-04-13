@@ -1,7 +1,6 @@
 # Gradle
 .gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
 
 # IDE
 .idea/
@@ -23,5 +22,6 @@ bin/
 .DS_Store
 Thumbs.db
 
-# Docker
+# JARs sueltos (el wrapper debe versionarse; la regla va después)
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
