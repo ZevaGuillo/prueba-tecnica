@@ -6,55 +6,88 @@ plugins {
 
 description = 'ms-clients: Microservicio de gestión de clientes'
 
-// Configuración común para todos los submodules
-subprojects {
-    apply plugin: 'java'
-    
-    group = 'com.zevaguillo.banking'
-    version = '1.0.0'
-    
-    repositories {
-        mavenCentral()
-        maven {
-            url = 'https://packages.confluent.io/maven/'
-        }
-    }
-    
-    // Configuración Java común
-    java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    
-    // Configuración de testing común
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events "passed", "skipped", "failed"
-            showStandardStreams = false
-        }
-    }
-    
-    // Dependencias comunes a todos los proyectos
-    dependencies {
-        // Logging común
-        implementation 'org.slf4j:slf4j-api:2.0.9'
+// Configuración común para proyectos no-test
+subprojects { subproject ->
+    if (!subproject.name.startsWith('test-')) {
+        apply plugin: 'java'
         
-        // Testing común
-        testImplementation platform('org.junit:junit-bom:5.9.2')
-        testImplementation 'org.junit.jupiter:junit-jupiter'
-        testImplementation 'org.assertj:assertj-core:3.24.2'
+        group = 'com.zevaguillo.banking'
+        version = '1.0.0'
+        
+        repositories {
+            mavenCentral()
+            maven {
+                url = 'https://packages.confluent.io/maven/'
+            }
+        }
+        
+        java {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
+        
+        test {
+            useJUnitPlatform()
+            testLogging {
+                events "passed", "skipped", "failed"
+                showStandardStreams = false
+            }
+        }
+        
+        sourceSets {
+            test {
+                java {
+                    srcDirs = ['test', 'src/test/java']
+                }
+            }
+        }
+        
+        dependencies {
+            implementation 'org.slf4j:slf4j-api:2.0.9'
+        }
+    }
+}
+
+// Proyectos de test reciben plugins de Spring Boot
+subprojects { subproject ->
+    if (subproject.name.startsWith('test:')) {
+        apply plugin: 'org.springframework.boot'
+        apply plugin: 'io.spring.dependency-management'
+        
+        repositories {
+            mavenCentral()
+        }
+        
+        java {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
+        
+        test {
+            useJUnitPlatform()
+            testLogging {
+                events "passed", "skipped", "failed"
+                showStandardStreams = false
+            }
+        }
     }
 }
 
 // Configuraciones específicas por tipo de módulo
-configure(subprojects.findAll { it.name.contains('jpa') || it.name.contains('kafka') || it.name.contains('api-rest') || it.name.contains('app-service') }) {
+configure(subprojects.findAll { 
+    it.name.contains('jpa') || it.name.contains('kafka') || 
+    it.name.contains('api-rest') || it.name.contains('app-service')
+}) {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
     
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
         implementation 'org.springframework.boot:spring-boot-starter-logging'
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
+        
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 }
