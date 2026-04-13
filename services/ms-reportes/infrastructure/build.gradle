@@ -1,0 +1,6 @@
+description = 'infrastructure layer'
+
+dependencies {
+    implementation project(':application')
+    implementation project(':domain')
+}

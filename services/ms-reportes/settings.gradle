@@ -1,0 +1,5 @@
+rootProject.name = 'ms-reportes'
+
+include 'domain'
+include 'application'
+include 'infrastructure'
