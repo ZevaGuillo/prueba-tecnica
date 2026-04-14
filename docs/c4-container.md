@@ -1,6 +1,6 @@
 # C4 Level 2 — Container
 
-Infraestructura y microservicios con sus tecnologías y puertos reales.
+Infraestructura y microservicios con sus tecnologías, puertos y patrones de comunicacion.
 
 ```mermaid
 C4Container
@@ -14,8 +14,8 @@ C4Container
   }
 
   Container_Boundary(apps, "Microservicios") {
-    Container(msClients, "ms-clients", "Spring Boot - Java 21 - :8082", "Gestiona personas y clientes. Publica eventos a cliente-events")
-    Container(msAccounts, "ms-accounts", "Spring Boot - Java 21 - :8081", "Gestiona cuentas y movimientos. Publica eventos a cuenta-creada y movimiento-registrado")
+    Container(msClients, "ms-clients", "Spring Boot - Java 21 - :8082", "Gestiona personas y clientes. Publica eventos via Outbox Pattern al topic cliente-events")
+    Container(msAccounts, "ms-accounts", "Spring Boot - Java 21 - :8081", "Gestiona cuentas y movimientos. Valida clientes via Read Model local. Publica eventos via Outbox Pattern")
     Container(msReportes, "ms-reportes", "Spring Boot - Java 21 - :8080", "Read model CQRS. Consume eventos Kafka y expone GET /api/reportes")
   }
 
@@ -23,11 +23,12 @@ C4Container
   Rel(usuario, msAccounts, "REST", "HTTP :8081")
   Rel(usuario, msReportes, "REST", "HTTP :8080")
 
-  Rel(msClients, postgres, "Lee y escribe personas/clientes", "JDBC - msclients_schema")
-  Rel(msAccounts, postgres, "Lee y escribe cuentas/movimientos", "JDBC - msaccounts_schema")
+  Rel(msClients, postgres, "Lee y escribe personas/clientes/outbox", "JDBC - msclients_schema")
+  Rel(msAccounts, postgres, "Lee y escribe cuentas/movimientos/outbox/clientes_cache", "JDBC - msaccounts_schema")
   Rel(msReportes, postgres, "Lee y escribe proyecciones", "JDBC - reportes_schema")
 
-  Rel(msClients, kafka, "Publica eventos", "cliente-events")
-  Rel(msAccounts, kafka, "Publica eventos", "cuenta-creada / cuenta-actualizada / movimiento-registrado")
+  Rel(msClients, kafka, "Publica via Outbox Relay", "cliente-events")
+  Rel(msAccounts, kafka, "Publica via Outbox Relay", "cuenta-creada / cuenta-actualizada / movimiento-registrado")
   Rel(kafka, msReportes, "Consume eventos", "cliente-events / cuenta-creada / movimiento-registrado")
+  Rel(kafka, msAccounts, "Consume para Read Model", "cliente-events (group: ms-accounts-group)")
 ```

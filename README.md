@@ -4,6 +4,7 @@ Sistema basado en microservicios para gestion de clientes, cuentas, movimientos 
 
 ## Tabla De Contenidos
 - Arquitectura
+- Patrones Implementados
 - Estructura Del Repositorio
 - Prerrequisitos
 - Levantar Todo Con Docker
@@ -12,20 +13,53 @@ Sistema basado en microservicios para gestion de clientes, cuentas, movimientos 
 - Script End-To-End
 - Eventos Kafka
 - Troubleshooting
+- Diagramas
 
 ## Arquitectura
-- **`ms-clients`**: alta y gestion de `personas` y `clientes`.
-- **`ms-accounts`**: gestion de `cuentas` y `movimientos`.
-- **`ms-reportes`**: read model para consulta consolidada de estado de cuenta.
+- **`ms-clients`**: alta y gestion de `personas` y `clientes`. Publica eventos via Outbox Pattern.
+- **`ms-accounts`**: gestion de `cuentas` y `movimientos`. Valida clientes via Read Model local. Publica eventos via Outbox Pattern.
+- **`ms-reportes`**: read model CQRS para consulta consolidada de estado de cuenta.
 - **`postgres`**: base `banking_db` con esquemas `msclients_schema`, `msaccounts_schema`, `reportes_schema`.
 - **`kafka`**: bus de eventos entre servicios.
 
 ### Estilo De Diseno
-- Arquitectura por capas `domain` / `application` / `infrastructure` dentro de cada servicio.
-  - `ms-reportes` sigue enfoque tipo CQRS read model:
-    - consume eventos asincronos desde Kafka,
-    - persiste proyecciones en `reportes_schema`,
-    - expone consultas en `/api/reportes`.
+
+Arquitectura hexagonal (ports & adapters) con capas `domain` / `application` / `infrastructure` por servicio.
+
+#### Transactional Outbox Pattern (`ms-clients` y `ms-accounts`)
+
+Los use cases NO publican directo a Kafka. En su lugar, dentro de la misma transaccion de negocio, escriben un registro en la tabla `outbox_events` con `status=PENDING`. Un servicio scheduler (`OutboxEventRelayService`, `@Scheduled` cada 1 segundo) lee los eventos pendientes, los publica a Kafka y los marca como `PUBLISHED`.
+
+Esto garantiza que si Kafka esta caido, el estado de negocio y el evento esten siempre en sincronía (o ambos se persisten, o ninguno).
+
+```
+UseCase (@Transactional)
+  ├── save(entidad)         → msX_schema.tabla
+  └── save(OutboxEvent)     → msX_schema.outbox_events (PENDING)
+
+OutboxRelayService (@Scheduled 1s)
+  ├── findByStatus(PENDING) → msX_schema.outbox_events
+  ├── kafkaTemplate.send()  → Kafka topic
+  └── markAsPublished()     → msX_schema.outbox_events (PUBLISHED)
+```
+
+#### Read Model Local (`ms-accounts`)
+
+`ms-accounts` consume el topic `cliente-events` y mantiene una tabla local `msaccounts_schema.clientes_cache`. Al crear una cuenta, `CrearCuentaUseCaseImpl` valida que el `clienteId` exista en la cache local antes de persistir. Si no existe, retorna `404 Not Found`.
+
+Esto evita cualquier llamada HTTP sincrónica entre microservicios, manteniendo bajo acoplamiento con consistencia eventual (~1s de ventana).
+
+```
+ms-clients → outbox_events → OutboxRelay → Kafka (cliente-events)
+                                                ↓
+ms-accounts: @KafkaListener → clientes_cache.upsert(clienteId)
+                                                ↓
+POST /api/cuentas → clienteCachePort.existsById() → 404 si no existe
+```
+
+#### Read Model CQRS (`ms-reportes`)
+
+Consume eventos Kafka de los tres topics, persiste proyecciones en `reportes_schema`, y expone consultas en `/api/reportes`. No tiene escrituras de negocio directas.
 
 ## Estructura Del Repositorio
 
@@ -41,6 +75,14 @@ Sistema basado en microservicios para gestion de clientes, cuentas, movimientos 
 │   ├── ms-clients/
 │   ├── ms-accounts/
 │   └── ms-reportes/
+├── docs/
+│   ├── c4-context.md
+│   ├── c4-container.md
+│   ├── c4-component-ms-clients.md
+│   ├── c4-component-ms-accounts.md
+│   ├── c4-component-ms-reportes.md
+│   ├── sequence-kafka-flow.md
+│   └── schema-database.md
 └── README.md
 ```
 
@@ -146,6 +188,7 @@ curl -X POST 'http://localhost:8082/api/clientes' \
 Notas de negocio:
 - `POST /api/clientes` rechaza duplicados por `clienteId` con `409`.
 - `contrasena` se guarda con hash BCrypt, no en texto plano.
+- Al crear un cliente, se publica un evento via Outbox Pattern al topic `cliente-events`. `ms-accounts` lo consume y actualiza su `clientes_cache` local.
 
 ## `ms-accounts` (`http://localhost:8081`)
 
@@ -173,8 +216,10 @@ curl -X POST 'http://localhost:8081/api/movimientos' \
 ```
 
 Notas de negocio:
+- `POST /api/cuentas` valida que el `clienteId` exista en la cache local (`clientes_cache`). Si no existe, retorna `404 Not Found`. El cliente debe haberse creado en `ms-clients` y el evento debe haberse propagado (~1s) antes de crear la cuenta.
 - La cuenta debe estar en estado `ACTIVE` para aceptar movimientos.
-- `X-Transaction-Id` evita reprocesamiento de movimientos duplicados.
+- `X-Transaction-Id` evita reprocesamiento de movimientos duplicados (`409`).
+- Los eventos de cuenta y movimiento se publican via Outbox Pattern (atomico con la escritura de negocio).
 
 ## `ms-reportes` (`http://localhost:8080`)
 
@@ -206,10 +251,13 @@ chmod +x infra/scripts/e2e-full-flow.sh
 ```
 
 Que valida:
-- flujo personas/clientes,
-- flujo cuentas/movimientos,
-- consulta de reportes con espera activa por consistencia eventual (Kafka),
-- casos de negocio (duplicado de cliente).
+- Smoke checks de los tres servicios.
+- Flujo personas/clientes (crear, obtener, actualizar, duplicado 409).
+- **Read Model**: intento de crear cuenta con `clienteId` inexistente retorna `404`.
+- Espera de propagacion Kafka (~3s) para que el cliente llegue al cache de `ms-accounts`.
+- Flujo cuentas/movimientos (deposito, retiro, idempotencia de transacciones).
+- Consulta de reportes con espera activa por consistencia eventual Kafka.
+- Limpieza: elimina cuenta y cliente al final.
 
 Opcionalmente puedes cambiar URLs:
 ```bash
@@ -221,18 +269,34 @@ REPORTES_BASE_URL=http://localhost:8080 \
 
 ## Eventos Kafka
 
-Topics usados en el entorno:
-- `cliente-events`
-- `cuenta-creada`
-- `cuenta-actualizada`
-- `movimiento-registrado`
-- (compatibilidad historica) `cuenta-events`, `movimiento-events`
+Topics usados:
+
+| Topic | Productor | Consumidor(es) |
+|---|---|---|
+| `cliente-events` | `ms-clients` (via Outbox) | `ms-reportes`, `ms-accounts` |
+| `cuenta-creada` | `ms-accounts` (via Outbox) | `ms-reportes` |
+| `cuenta-actualizada` | `ms-accounts` (via Outbox) | `ms-reportes` |
+| `movimiento-registrado` | `ms-accounts` (via Outbox) | `ms-reportes` |
 
 Inicializacion de topics:
 - `infra/scripts/create-kafka-topics.sh`
 - servicio `kafka-init-topics` en `infra/compose.yml`
 
+### Tablas Outbox
+
+Cada servicio tiene su propia tabla de outbox en su esquema:
+
+| Tabla | Servicio |
+|---|---|
+| `msaccounts_schema.outbox_events` | `ms-accounts` |
+| `msclients_schema.outbox_events` | `ms-clients` |
+
+Campos: `id (UUID PK)`, `aggregate_id`, `aggregate_type`, `event_type`, `topic`, `payload (TEXT/JSON)`, `status (PENDING/PUBLISHED)`, `created_at`, `published_at`.
+
 ## Troubleshooting
+
+- **`404 Cliente no existe` al crear cuenta**
+  - El cliente aun no fue propagado al cache de `ms-accounts`. Espera ~2-3 segundos despues de crear el cliente en `ms-clients` y reintenta. Es consistencia eventual del Read Model.
 
 - **`Cuenta no esta activa` en movimientos**
   - Verifica estado de cuenta: debe ser exactamente `ACTIVE`.
@@ -254,14 +318,14 @@ Inicializacion de topics:
 
 ## Diagramas
 
-Los diagramas Mermaid C4 y ER viven en [`docs/`](docs/README.md):
+Los diagramas Mermaid C4 y ER viven en [`docs/`](docs/):
 
 | Diagrama | Descripcion |
 |---|---|
 | [C4 Context](docs/c4-context.md) | Vista de actores y sistema |
 | [C4 Container](docs/c4-container.md) | Microservicios, PostgreSQL y Kafka |
 | [C4 Component ms-clients](docs/c4-component-ms-clients.md) | Capas internas de ms-clients |
-| [C4 Component ms-accounts](docs/c4-component-ms-accounts.md) | Capas internas de ms-accounts |
+| [C4 Component ms-accounts](docs/c4-component-ms-accounts.md) | Capas internas de ms-accounts con Outbox y Read Model |
 | [C4 Component ms-reportes](docs/c4-component-ms-reportes.md) | Capas internas de ms-reportes |
-| [Sequence Diagrams](docs/sequence-kafka-flow.md) | Flujos E2E y flujos de error |
-| [ER Schema](docs/schema-database.md) | Esquema banking_db completo |
+| [Sequence Diagrams](docs/sequence-kafka-flow.md) | Flujos E2E, Outbox Pattern, Read Model y errores |
+| [ER Schema](docs/schema-database.md) | Esquema banking_db completo con tablas outbox y cache |
