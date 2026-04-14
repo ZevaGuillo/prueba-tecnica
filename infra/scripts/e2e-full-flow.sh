@@ -145,6 +145,14 @@ main() {
   request "duplicado cliente debe fallar" "POST" "${CLIENTS_BASE_URL}/api/clientes" "409" \
     "{\"clienteId\":\"${cliente_id}\",\"identificacion\":\"${persona_id}\",\"nombre\":\"Juan E2E\",\"genero\":\"M\",\"edad\":30,\"direccion\":\"Calle E2E\",\"telefono\":\"099123456\",\"contrasena\":\"password123\"}"
 
+  log "Validacion de read model cliente en ms-accounts"
+  request "cuenta con cliente inexistente debe retornar 404" "POST" "${ACCOUNTS_BASE_URL}/api/cuentas" "404" \
+    "{\"cuentaId\":\"acc-fantasma-${ts}\",\"numeroCuenta\":\"nc-fantasma-${ts}\",\"tipoCuenta\":\"AHORROS\",\"saldo\":0.0,\"clienteId\":\"cli-fantasma-${ts}\",\"estado\":\"ACTIVE\"}"
+  assert_body_contains "Cliente no existe"
+
+  echo "Esperando propagacion del cliente al cache de ms-accounts (outbox relay ~1s + consumer)..."
+  sleep 3
+
   log "Flujo cuentas/movimientos"
   request "crear cuenta" "POST" "${ACCOUNTS_BASE_URL}/api/cuentas" "201" \
     "{\"cuentaId\":\"${cuenta_id}\",\"numeroCuenta\":\"${numero_cuenta}\",\"tipoCuenta\":\"AHORROS\",\"saldo\":0.0,\"clienteId\":\"${cliente_id}\",\"estado\":\"ACTIVE\"}"

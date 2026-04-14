@@ -1,7 +1,8 @@
 package com.zevaguillo.infrastructure.rest.exception;
 
-import com.zevaguillo.application.exception.CuentaAlreadyExistsException;
 import com.zevaguillo.application.exception.ActualizacionConcurrenteCuentaException;
+import com.zevaguillo.application.exception.ClienteNoEncontradoException;
+import com.zevaguillo.application.exception.CuentaAlreadyExistsException;
 import com.zevaguillo.application.exception.CuentaConSaldoActivoException;
 import com.zevaguillo.application.exception.TransaccionDuplicadaException;
 import org.springframework.http.HttpStatus;
@@ -67,6 +68,16 @@ public class GlobalExceptionHandler {
                 "timestamp", LocalDateTime.now().toString(),
                 "status", HttpStatus.CONFLICT.value(),
                 "error", "Conflict",
+                "message", ex.getMessage()
+        ));
+    }
+
+    @ExceptionHandler(ClienteNoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> handleClienteNoEncontrado(ClienteNoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", HttpStatus.NOT_FOUND.value(),
+                "error", "Not Found",
                 "message", ex.getMessage()
         ));
     }

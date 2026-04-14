@@ -2,8 +2,10 @@ package com.zevaguillo.application.usecase;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zevaguillo.application.exception.ClienteNoEncontradoException;
 import com.zevaguillo.application.exception.CuentaAlreadyExistsException;
 import com.zevaguillo.application.port.in.CrearCuentaUseCase;
+import com.zevaguillo.application.port.out.ClienteCachePersistencePort;
 import com.zevaguillo.application.port.out.CuentaPersistencePort;
 import com.zevaguillo.application.port.out.OutboxEventPersistencePort;
 import com.zevaguillo.domain.model.Cuenta;
@@ -19,13 +21,16 @@ public class CrearCuentaUseCaseImpl implements CrearCuentaUseCase {
 
     private final CuentaPersistencePort persistencePort;
     private final OutboxEventPersistencePort outboxPort;
+    private final ClienteCachePersistencePort clienteCachePort;
     private final ObjectMapper objectMapper;
 
     public CrearCuentaUseCaseImpl(CuentaPersistencePort persistencePort,
                                   OutboxEventPersistencePort outboxPort,
+                                  ClienteCachePersistencePort clienteCachePort,
                                   ObjectMapper objectMapper) {
         this.persistencePort = persistencePort;
         this.outboxPort = outboxPort;
+        this.clienteCachePort = clienteCachePort;
         this.objectMapper = objectMapper;
     }
 
@@ -37,6 +42,9 @@ public class CrearCuentaUseCaseImpl implements CrearCuentaUseCase {
         }
         if (cuenta.getClienteId() == null || cuenta.getClienteId().isBlank()) {
             throw new IllegalArgumentException("Cliente ID es requerido");
+        }
+        if (!clienteCachePort.existsById(cuenta.getClienteId())) {
+            throw new ClienteNoEncontradoException("Cliente no existe: " + cuenta.getClienteId());
         }
         if (persistencePort.existsByNumeroCuenta(cuenta.getNumeroCuenta())) {
             throw new CuentaAlreadyExistsException("Número de cuenta ya existe: " + cuenta.getNumeroCuenta());

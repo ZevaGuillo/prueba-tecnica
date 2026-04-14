@@ -116,6 +116,17 @@ ALTER TABLE IF EXISTS reportes_schema.reporte_movimiento
     ALTER COLUMN cliente_id TYPE VARCHAR(50) USING cliente_id::varchar;
 
 -- ---------------------------------------------------------------------------
+-- Read model cliente en ms-accounts (cache local para validación)
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS msaccounts_schema.clientes_cache (
+    cliente_id  VARCHAR(50)  PRIMARY KEY,
+    nombre      VARCHAR(100),
+    estado      VARCHAR(20)  NOT NULL,
+    synced_at   TIMESTAMP    NOT NULL
+);
+
+-- ---------------------------------------------------------------------------
 -- Outbox pattern — eventos pendientes de publicación a Kafka
 -- ---------------------------------------------------------------------------
 
