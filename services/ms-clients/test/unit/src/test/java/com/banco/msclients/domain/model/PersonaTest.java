@@ -1,4 +1,4 @@
-package com.banco.msclients.domain.model;
+package com.zevaguillo.domain.model;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

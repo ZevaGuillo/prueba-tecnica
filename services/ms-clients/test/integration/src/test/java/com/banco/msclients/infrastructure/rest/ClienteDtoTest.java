@@ -1,8 +1,8 @@
-package com.banco.msclients.infrastructure.rest;
+package com.zevaguillo.infrastructure.rest;
 
-import com.banco.msclients.domain.model.Cliente;
-import com.banco.msclients.infrastructure.rest.dto.ClienteRequest;
-import com.banco.msclients.infrastructure.rest.dto.ClienteResponse;
+import com.zevaguillo.domain.model.Cliente;
+import com.zevaguillo.infrastructure.rest.dto.ClienteRequest;
+import com.zevaguillo.infrastructure.rest.dto.ClienteResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
