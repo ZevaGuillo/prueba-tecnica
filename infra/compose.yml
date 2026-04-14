@@ -17,9 +17,10 @@ services:
     container_name: banking-kafka
     environment:
       KAFKA_NODE_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
@@ -28,6 +29,63 @@ services:
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
     ports:
       - "9092:9092"
+
+  kafka-init-topics:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka-init-topics
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+    volumes:
+      - ./scripts/create-kafka-topics.sh:/scripts/create-kafka-topics.sh:ro
+    entrypoint: ["/bin/sh", "/scripts/create-kafka-topics.sh"]
+    restart: "no"
+
+  ms-accounts:
+    build: ../services/ms-accounts
+    container_name: ms-accounts
+    environment:
+      SPRING_DATASOURCE_URL: ${ACCOUNTS_DB_URL:-jdbc:postgresql://postgres:5432/banking_db}
+      SPRING_DATASOURCE_USERNAME: ${ACCOUNTS_DB_USER:-banking_user}
+      SPRING_DATASOURCE_PASSWORD: ${ACCOUNTS_DB_PASS:-banking_pass}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      SERVER_PORT: ${ACCOUNTS_PORT:-8081}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+      - kafka-init-topics
+
+  ms-clients:
+    build: ../services/ms-clients
+    container_name: ms-clients
+    environment:
+      SPRING_DATASOURCE_URL: ${CLIENTS_DB_URL:-jdbc:postgresql://postgres:5432/banking_db}
+      SPRING_DATASOURCE_USERNAME: ${CLIENTS_DB_USER:-banking_user}
+      SPRING_DATASOURCE_PASSWORD: ${CLIENTS_DB_PASS:-banking_pass}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      SERVER_PORT: ${CLIENTS_PORT:-8082}
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - kafka-init-topics
+
+  ms-reportes:
+    build: ../services/ms-reportes
+    container_name: ms-reportes
+    environment:
+      SPRING_DATASOURCE_URL: ${REPORTES_DB_URL:-jdbc:postgresql://postgres:5432/banking_db}
+      SPRING_DATASOURCE_USERNAME: ${REPORTES_DB_USER:-banking_user}
+      SPRING_DATASOURCE_PASSWORD: ${REPORTES_DB_PASS:-banking_pass}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS:-kafka:29092}
+      SERVER_PORT: ${REPORTES_PORT:-8080}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - kafka-init-topics
 
 
 volumes:

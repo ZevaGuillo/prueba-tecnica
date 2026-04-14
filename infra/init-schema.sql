@@ -53,7 +53,7 @@ CREATE INDEX idx_movimientos_fecha ON msaccounts_schema.movimientos(fecha);
 
 CREATE TABLE IF NOT EXISTS reportes_schema.reporte_cliente (
     id UUID PRIMARY KEY,
-    cliente_id UUID NOT NULL,
+    cliente_id VARCHAR(50) NOT NULL,
     nombre VARCHAR(255) NOT NULL,
     identificacion VARCHAR(50) NOT NULL,
     email VARCHAR(255),
@@ -66,8 +66,8 @@ CREATE INDEX IF NOT EXISTS idx_reporte_cliente_cliente_id ON reportes_schema.rep
 
 CREATE TABLE IF NOT EXISTS reportes_schema.reporte_cuenta (
     id UUID PRIMARY KEY,
-    cuenta_id UUID NOT NULL,
-    cliente_id UUID NOT NULL,
+    cuenta_id VARCHAR(50) NOT NULL,
+    cliente_id VARCHAR(50) NOT NULL,
     numero_cuenta VARCHAR(50) NOT NULL,
     tipo VARCHAR(20) NOT NULL,
     saldo_actual DECIMAL(19, 4) NOT NULL,
@@ -80,9 +80,9 @@ CREATE INDEX IF NOT EXISTS idx_reporte_cuenta_cliente_id ON reportes_schema.repo
 
 CREATE TABLE IF NOT EXISTS reportes_schema.reporte_movimiento (
     id UUID PRIMARY KEY,
-    movimiento_id UUID NOT NULL,
-    cuenta_id UUID NOT NULL,
-    cliente_id UUID NOT NULL,
+    movimiento_id VARCHAR(50) NOT NULL,
+    cuenta_id VARCHAR(50) NOT NULL,
+    cliente_id VARCHAR(50) NOT NULL,
     tipo VARCHAR(20) NOT NULL,
     monto DECIMAL(19, 4) NOT NULL,
     saldo_posterior DECIMAL(19, 4) NOT NULL,
@@ -100,6 +100,20 @@ CREATE TABLE IF NOT EXISTS reportes_schema.processed_event (
 );
 
 CREATE INDEX IF NOT EXISTS idx_processed_event_fecha ON reportes_schema.processed_event(fecha_procesamiento);
+
+-- Compatibilidad con entornos ya creados: permite IDs no UUID (ej: cli-001)
+ALTER TABLE IF EXISTS reportes_schema.reporte_cliente
+    ALTER COLUMN cliente_id TYPE VARCHAR(50) USING cliente_id::varchar;
+ALTER TABLE IF EXISTS reportes_schema.reporte_cuenta
+    ALTER COLUMN cuenta_id TYPE VARCHAR(50) USING cuenta_id::varchar;
+ALTER TABLE IF EXISTS reportes_schema.reporte_cuenta
+    ALTER COLUMN cliente_id TYPE VARCHAR(50) USING cliente_id::varchar;
+ALTER TABLE IF EXISTS reportes_schema.reporte_movimiento
+    ALTER COLUMN movimiento_id TYPE VARCHAR(50) USING movimiento_id::varchar;
+ALTER TABLE IF EXISTS reportes_schema.reporte_movimiento
+    ALTER COLUMN cuenta_id TYPE VARCHAR(50) USING cuenta_id::varchar;
+ALTER TABLE IF EXISTS reportes_schema.reporte_movimiento
+    ALTER COLUMN cliente_id TYPE VARCHAR(50) USING cliente_id::varchar;
 
 GRANT ALL ON SCHEMA msclients_schema TO banking_user;
 GRANT ALL ON SCHEMA msaccounts_schema TO banking_user;
