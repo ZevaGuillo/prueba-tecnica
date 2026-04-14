@@ -3,4 +3,4 @@
 **/.gradle
 **/build
 *.iml
-bin
+# No usar el patrón "bin" solo: en Docker puede excluir cualquier segmento de ruta "bin" y vaciar el contexto.

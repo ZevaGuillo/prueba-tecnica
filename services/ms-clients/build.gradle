@@ -1,103 +1,59 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.3' apply false
-    id 'io.spring.dependency-management' version '1.1.4' apply false
+    id 'org.springframework.boot' version '4.0.3'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
+group = 'com.zevaguillo.banking'
+version = '1.0.0'
 description = 'ms-clients: Microservicio de gestión de clientes'
 
-// Configuración común para proyectos no-test
-subprojects { subproject ->
-    if (!subproject.name.startsWith('test-')) {
-        apply plugin: 'java'
-        
-        group = 'com.zevaguillo.banking'
-        version = '1.0.0'
-        
-        repositories {
-            mavenCentral()
-            maven {
-                url = 'https://packages.confluent.io/maven/'
-            }
-        }
-        
-        java {
-            sourceCompatibility = JavaVersion.VERSION_21
-            targetCompatibility = JavaVersion.VERSION_21
-        }
-        
-        test {
-            useJUnitPlatform()
-            testLogging {
-                events "passed", "skipped", "failed"
-                showStandardStreams = false
-            }
-        }
-        
-        sourceSets {
-            test {
-                java {
-                    srcDirs = ['test', 'src/test/java']
-                }
-            }
-        }
-        
-        dependencies {
-            implementation 'org.slf4j:slf4j-api:2.0.9'
-        }
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://packages.confluent.io/maven/'
     }
 }
 
-// Proyectos de test reciben plugins de Spring Boot
-subprojects { subproject ->
-    if (subproject.name.startsWith('test:')) {
-        apply plugin: 'org.springframework.boot'
-        apply plugin: 'io.spring.dependency-management'
-        
-        repositories {
-            mavenCentral()
-        }
-        
-        java {
-            sourceCompatibility = JavaVersion.VERSION_21
-            targetCompatibility = JavaVersion.VERSION_21
-        }
-        
-        test {
-            useJUnitPlatform()
-            testLogging {
-                events "passed", "skipped", "failed"
-                showStandardStreams = false
-            }
-        }
-    }
+bootJar {
+    mainClass = 'com.zevaguillo.infrastructure.MsClientApplication'
 }
 
-// Configuraciones específicas por tipo de módulo
-configure(subprojects.findAll { 
-    it.name.contains('jpa') || it.name.contains('kafka') || 
-    it.name.contains('api-rest') || it.name.contains('app-service')
-}) {
-    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
-    
-    dependencies {
-        implementation 'org.springframework.boot:spring-boot-starter'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'org.springframework.boot:spring-boot-starter-validation'
-        implementation 'org.springframework.boot:spring-boot-starter-logging'
-        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
-        
-        testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    }
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.2.0')
+    implementation 'org.springframework:spring-context'
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.security:spring-security-crypto'
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.postgresql:postgresql:42.7.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+    testImplementation platform('org.junit:junit-bom:5.9.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-// Evita colisión en Eclipse/VS Code Java al importar ms-clients junto a ms-accounts u otros (:application, :domain, etc.)
-subprojects { Project p ->
-    p.apply plugin: 'eclipse'
-    p.eclipse {
-        project {
-            name = "${rootProject.name}-${p.path.substring(1).replace(':', '-')}"
-        }
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = false
     }
 }

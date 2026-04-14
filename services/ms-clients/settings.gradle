@@ -1,7 +1,1 @@
 rootProject.name = 'ms-clients'
-
-include 'domain'
-include 'application'
-include 'infrastructure'
-include 'test:unit'
-include 'test:integration'
