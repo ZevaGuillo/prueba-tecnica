@@ -115,6 +115,38 @@ ALTER TABLE IF EXISTS reportes_schema.reporte_movimiento
 ALTER TABLE IF EXISTS reportes_schema.reporte_movimiento
     ALTER COLUMN cliente_id TYPE VARCHAR(50) USING cliente_id::varchar;
 
+-- ---------------------------------------------------------------------------
+-- Outbox pattern — eventos pendientes de publicación a Kafka
+-- ---------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS msaccounts_schema.outbox_events (
+    id             VARCHAR(36)   PRIMARY KEY,
+    aggregate_id   VARCHAR(100)  NOT NULL,
+    aggregate_type VARCHAR(100)  NOT NULL,
+    event_type     VARCHAR(100)  NOT NULL,
+    topic          VARCHAR(200)  NOT NULL,
+    payload        TEXT          NOT NULL,
+    status         VARCHAR(20)   NOT NULL DEFAULT 'PENDING',
+    created_at     TIMESTAMP     NOT NULL,
+    published_at   TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_msaccounts_outbox_status
+    ON msaccounts_schema.outbox_events(status);
+
+CREATE TABLE IF NOT EXISTS msclients_schema.outbox_events (
+    id             VARCHAR(36)   PRIMARY KEY,
+    aggregate_id   VARCHAR(100)  NOT NULL,
+    aggregate_type VARCHAR(100)  NOT NULL,
+    event_type     VARCHAR(100)  NOT NULL,
+    topic          VARCHAR(200)  NOT NULL,
+    payload        TEXT          NOT NULL,
+    status         VARCHAR(20)   NOT NULL DEFAULT 'PENDING',
+    created_at     TIMESTAMP     NOT NULL,
+    published_at   TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_msclients_outbox_status
+    ON msclients_schema.outbox_events(status);
+
 GRANT ALL ON SCHEMA msclients_schema TO banking_user;
 GRANT ALL ON SCHEMA msaccounts_schema TO banking_user;
 GRANT ALL ON SCHEMA reportes_schema TO banking_user;

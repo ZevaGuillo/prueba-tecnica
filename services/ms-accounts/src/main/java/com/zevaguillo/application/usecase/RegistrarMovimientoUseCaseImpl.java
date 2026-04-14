@@ -1,31 +1,42 @@
 package com.zevaguillo.application.usecase;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zevaguillo.application.exception.TransaccionDuplicadaException;
 import com.zevaguillo.application.port.in.RegistrarMovimientoUseCase;
-import com.zevaguillo.application.port.out.CuentaEventPort;
 import com.zevaguillo.application.port.out.CuentaPersistencePort;
 import com.zevaguillo.application.port.out.MovimientoPersistencePort;
+import com.zevaguillo.application.port.out.OutboxEventPersistencePort;
 import com.zevaguillo.domain.model.Cuenta;
 import com.zevaguillo.domain.model.Movimiento;
+import com.zevaguillo.domain.model.OutboxEvent;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class RegistrarMovimientoUseCaseImpl implements RegistrarMovimientoUseCase {
 
     private final CuentaPersistencePort cuentaPersistencePort;
     private final MovimientoPersistencePort movimientoPersistencePort;
-    private final CuentaEventPort eventPort;
+    private final OutboxEventPersistencePort outboxPort;
+    private final ObjectMapper objectMapper;
 
     public RegistrarMovimientoUseCaseImpl(
             CuentaPersistencePort cuentaPersistencePort,
             MovimientoPersistencePort movimientoPersistencePort,
-            CuentaEventPort eventPort) {
+            OutboxEventPersistencePort outboxPort,
+            ObjectMapper objectMapper) {
         this.cuentaPersistencePort = cuentaPersistencePort;
         this.movimientoPersistencePort = movimientoPersistencePort;
-        this.eventPort = eventPort;
+        this.outboxPort = outboxPort;
+        this.objectMapper = objectMapper;
     }
 
     @Override
+    @Transactional
     public Movimiento ejecutar(Movimiento movimiento, String transactionId) {
         if (transactionId != null && !transactionId.isEmpty()) {
             if (movimientoPersistencePort.existsByTransactionId(transactionId)) {
@@ -72,7 +83,23 @@ public class RegistrarMovimientoUseCaseImpl implements RegistrarMovimientoUseCas
         }
 
         Movimiento guardado = movimientoPersistencePort.save(movimiento);
-        eventPort.publicarMovimientoRegistrado(guardado);
+
+        try {
+            String payload = objectMapper.writeValueAsString(guardado);
+            OutboxEvent event = new OutboxEvent(
+                    UUID.randomUUID().toString(),
+                    guardado.getMovimientoId(),
+                    "Movimiento",
+                    "MovimientoRegistrado",
+                    "movimiento-registrado",
+                    payload,
+                    "PENDING",
+                    LocalDateTime.now()
+            );
+            outboxPort.save(event);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error serializando evento MovimientoRegistrado", e);
+        }
 
         return guardado;
     }

@@ -20,7 +20,7 @@ public class ReporteIntegrationTest {
 
     @Test
     void shouldReturnNotFoundForNonExistentCliente() {
-        String url = String.format("/reportes?clienteId=%s&fechaInicio=%s&fechaFin=%s",
+        String url = String.format("/api/reportes?clienteId=%s&fechaInicio=%s&fechaFin=%s",
             "550e8400-e29b-41d4-a716-446655440000",
             LocalDate.of(2026, 1, 1),
             LocalDate.of(2026, 12, 31));
@@ -32,7 +32,7 @@ public class ReporteIntegrationTest {
 
     @Test
     void shouldReturnBadRequestForInvalidDateRange() {
-        String url = String.format("/reportes?clienteId=%s&fechaInicio=%s&fechaFin=%s",
+        String url = String.format("/api/reportes?clienteId=%s&fechaInicio=%s&fechaFin=%s",
             "550e8400-e29b-41d4-a716-446655440000",
             LocalDate.of(2026, 12, 31),
             LocalDate.of(2026, 1, 1));
@@ -44,7 +44,7 @@ public class ReporteIntegrationTest {
 
     @Test
     void shouldReturnBadRequestForInvalidPagination() {
-        String url = String.format("/reportes?clienteId=%s&fechaInicio=%s&fechaFin=%s&size=%d",
+        String url = String.format("/api/reportes?clienteId=%s&fechaInicio=%s&fechaFin=%s&size=%d",
             "550e8400-e29b-41d4-a716-446655440000",
             LocalDate.of(2026, 1, 1),
             LocalDate.of(2026, 12, 31),
