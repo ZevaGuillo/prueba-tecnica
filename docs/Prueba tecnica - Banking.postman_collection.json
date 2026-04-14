@@ -1,0 +1,629 @@
+{
+	"info": {
+		"_postman_id": "3294d838-9b3a-40ac-ae18-0c8ae995484c",
+		"name": "Prueba tecnica - Banking",
+		"description": "Colección de endpoints para el sistema bancario de microservicios.\n\n## Variables de colección\n\n| Variable | Valor por defecto | Descripción |\n|---|---|---|\n| `servidor` | `localhost` | Host del servidor |\n| `puerto_clients` | `8082` | Puerto de ms-clients |\n| `puerto_accounts` | `8081` | Puerto de ms-accounts |\n| `puerto_reportes` | `8080` | Puerto de ms-reportes |\n\n## Formato de URLs\n\n```\nhttp://{{servidor}}:{{puerto_*}}/api/{método}/{parámetros}\n```\n\n## Orden de ejecución sugerido\n1. Crear persona (ms-clients)\n2. Crear cliente (ms-clients)\n3. Crear cuenta (ms-accounts)\n4. Registrar movimiento (ms-accounts)\n5. Consultar reporte (ms-reportes)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19652285"
+	},
+	"item": [
+		{
+			"name": "ms-clients",
+			"item": [
+				{
+					"name": "Personas",
+					"item": [
+						{
+							"name": "Crear persona",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"identificacion\": \"123\",\n  \"nombre\": \"Juan Perez\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"direccion\": \"Calle 1 #23-45\",\n  \"telefono\": \"099123456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/personas",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"personas"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Listar personas",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/personas",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"personas"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener persona por Id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/personas/123",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"personas",
+										"123"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Clientes",
+					"item": [
+						{
+							"name": "Crear cliente",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clienteId\": \"CLI001\",\n  \"identificacion\": \"123\",\n  \"nombre\": \"Juan Perez\",\n  \"genero\": \"M\",\n  \"edad\": 30,\n  \"direccion\": \"Calle 1 #23-45\",\n  \"telefono\": \"099123456\",\n  \"contrasena\": \"password123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/clientes",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"clientes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Listar clientes",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/clientes",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"clientes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener cliente por Id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/clientes/CLI001",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"clientes",
+										"CLI001"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar cliente",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clienteId\": \"CLI001\",\n  \"identificacion\": \"123\",\n  \"nombre\": \"Juan Perez Updated\",\n  \"genero\": \"M\",\n  \"edad\": 31,\n  \"direccion\": \"Calle 2 #10-20\",\n  \"telefono\": \"099999999\",\n  \"contrasena\": \"newpass456\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/clientes/CLI001",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"clientes",
+										"CLI001"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Eliminar cliente",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_clients}}/api/clientes/CLI001",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_clients}}",
+									"path": [
+										"api",
+										"clientes",
+										"CLI001"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ms-accounts",
+			"item": [
+				{
+					"name": "Cuentas",
+					"item": [
+						{
+							"name": "Crear cuenta",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"cuentaId\": \"ACC001\",\n  \"numeroCuenta\": \"4787583\",\n  \"tipoCuenta\": \"AHORROS\",\n  \"saldo\": 1000.00,\n  \"clienteId\": \"CLI001\",\n  \"estado\": \"ACTIVE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/cuentas",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"cuentas"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Listar todas las cuentas",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/cuentas",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"cuentas"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener cuenta por Id",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/cuentas/ACC001",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"cuentas",
+										"ACC001"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener cuentas de un cliente",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/cuentas/cliente/CLI001",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"cuentas",
+										"cliente",
+										"CLI001"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar cuenta (PATCH)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"estado\": \"INACTIVE\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/cuentas/ACC001",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"cuentas",
+										"ACC001"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Eliminar cuenta",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/cuentas/ACC001",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"cuentas",
+										"ACC001"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Movimientos",
+					"item": [
+						{
+							"name": "Registrar movimiento (DEPOSITO)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Transaction-Id",
+										"value": "tx-001",
+										"description": "ID único de transacción para idempotencia. Cambiar por cada request."
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"movimientoId\": \"MOV001\",\n  \"cuentaId\": \"ACC001\",\n  \"tipoMovimiento\": \"DEPOSITO\",\n  \"valor\": 200.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/movimientos",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"movimientos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Registrar movimiento (RETIRO)",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Transaction-Id",
+										"value": "tx-002",
+										"description": "ID único de transacción para idempotencia. Cambiar por cada request."
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"movimientoId\": \"MOV002\",\n  \"cuentaId\": \"ACC001\",\n  \"tipoMovimiento\": \"RETIRO\",\n  \"valor\": 50.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{servidor}}:{{puerto_accounts}}/api/movimientos",
+									"protocol": "http",
+									"host": [
+										"{{servidor}}"
+									],
+									"port": "{{puerto_accounts}}",
+									"path": [
+										"api",
+										"movimientos"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ms-reportes",
+			"item": [
+				{
+					"name": "Consultar reporte de estado de cuenta",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"value": "corr-001",
+								"description": "ID de correlación para trazabilidad"
+							}
+						],
+						"url": {
+							"raw": "http://{{servidor}}:{{puerto_reportes}}/api/reportes?clienteId=CLI001&fechaInicio=2026-01-01&fechaFin=2026-12-31&page=0&size=20",
+							"protocol": "http",
+							"host": [
+								"{{servidor}}"
+							],
+							"port": "{{puerto_reportes}}",
+							"path": [
+								"api",
+								"reportes"
+							],
+							"query": [
+								{
+									"key": "clienteId",
+									"value": "CLI001",
+									"description": "ID del cliente"
+								},
+								{
+									"key": "fechaInicio",
+									"value": "2026-01-01",
+									"description": "Fecha inicio del período (ISO 8601)"
+								},
+								{
+									"key": "fechaFin",
+									"value": "2026-12-31",
+									"description": "Fecha fin del período (ISO 8601)"
+								},
+								{
+									"key": "page",
+									"value": "0",
+									"description": "Número de página (0-based)"
+								},
+								{
+									"key": "size",
+									"value": "20",
+									"description": "Cantidad de registros por página"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "servidor",
+			"value": "localhost",
+			"description": "Host del servidor (ej: localhost o IP del servidor)"
+		},
+		{
+			"key": "puerto_clients",
+			"value": "8082",
+			"description": "Puerto de ms-clients"
+		},
+		{
+			"key": "puerto_accounts",
+			"value": "8081",
+			"description": "Puerto de ms-accounts"
+		},
+		{
+			"key": "puerto_reportes",
+			"value": "8080",
+			"description": "Puerto de ms-reportes"
+		}
+	]
+}
