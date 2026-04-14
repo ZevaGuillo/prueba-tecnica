@@ -1,6 +1,6 @@
-package com.zevaguillo.msreportes;
+package com.zevaguillo;
 
-import com.zevaguillo.msreportes.infrastructure.MsReportesApplication;
+import com.zevaguillo.infrastructure.MsReportesApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
