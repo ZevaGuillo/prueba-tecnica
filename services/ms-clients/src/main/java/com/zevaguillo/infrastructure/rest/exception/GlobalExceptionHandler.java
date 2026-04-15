@@ -16,7 +16,22 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String JSON_TIMESTAMP = "timestamp";
+    private static final String JSON_STATUS = "status";
+    private static final String JSON_ERROR = "error";
+    private static final String JSON_MESSAGE = "message";
+
     private static final Pattern IDENTIFICACION_PATTERN = Pattern.compile("\\(identificacion\\)=\\(([^)]+)\\)");
+
+    private static Map<String, Object> jsonError(int statusValue, String error, String message) {
+        return Map.of(
+                JSON_TIMESTAMP, LocalDateTime.now().toString(),
+                JSON_STATUS, statusValue,
+                JSON_ERROR, error,
+                JSON_MESSAGE, message
+        );
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -24,32 +39,20 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", HttpStatus.BAD_REQUEST.value(),
-                "error", "Validation Failed",
-                "message", errors
-        ));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                jsonError(HttpStatus.BAD_REQUEST.value(), "Validation Failed", errors));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", HttpStatus.BAD_REQUEST.value(),
-                "error", "Bad Request",
-                "message", ex.getMessage()
-        ));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                jsonError(HttpStatus.BAD_REQUEST.value(), "Bad Request", ex.getMessage()));
     }
 
     @ExceptionHandler(ClienteYaExisteException.class)
     public ResponseEntity<Map<String, Object>> handleClienteYaExiste(ClienteYaExisteException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", HttpStatus.CONFLICT.value(),
-                "error", "Cliente Duplicado",
-                "message", ex.getMessage()
-        ));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                jsonError(HttpStatus.CONFLICT.value(), "Cliente Duplicado", ex.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -64,20 +67,13 @@ public class GlobalExceptionHandler {
                     ? "No se puede crear/actualizar el cliente: la persona con identificacion '" + identificacion + "' no existe."
                     : "No se puede crear/actualizar el cliente: la persona asociada no existe.";
 
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                    "timestamp", LocalDateTime.now().toString(),
-                    "status", HttpStatus.CONFLICT.value(),
-                    "error", "Foreign Key Violation",
-                    "message", message
-            ));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    jsonError(HttpStatus.CONFLICT.value(), "Foreign Key Violation", message));
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                "timestamp", LocalDateTime.now().toString(),
-                "status", HttpStatus.CONFLICT.value(),
-                "error", "Data Integrity Violation",
-                "message", "La operación viola una restricción de integridad de datos."
-        ));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                jsonError(HttpStatus.CONFLICT.value(), "Data Integrity Violation",
+                        "La operación viola una restricción de integridad de datos."));
     }
 
     private String extractIdentificacion(String message) {

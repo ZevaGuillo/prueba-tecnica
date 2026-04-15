@@ -1,3 +1,4 @@
+# Configuración de ejecución local/producción. Los tests de integración usan el perfil `test` (src/test/resources/application-test.yml).
 server:
   port: 8080
 

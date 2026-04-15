@@ -32,9 +32,14 @@ public class OutboxEventRelayService {
             try {
                 kafkaTemplate.send(event.getTopic(), event.getAggregateId(), event.getPayload());
                 outboxPort.markAsPublished(event.getId());
-                log.info("Outbox event published: id={} type={} topic={}", event.getId(), event.getEventType(), event.getTopic());
+                if (log.isInfoEnabled()) {
+                    log.info("Outbox event published: id={} type={} topic={}",
+                            event.getId(), event.getEventType(), event.getTopic());
+                }
             } catch (Exception e) {
-                log.error("Error publishing outbox event id={}: {}", event.getId(), e.getMessage());
+                if (log.isErrorEnabled()) {
+                    log.error("Error publishing outbox event id={}: {}", event.getId(), e.getMessage());
+                }
             }
         }
     }

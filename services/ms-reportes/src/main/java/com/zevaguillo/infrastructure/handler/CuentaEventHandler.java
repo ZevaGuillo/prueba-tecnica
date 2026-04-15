@@ -57,7 +57,9 @@ public class CuentaEventHandler {
             }
 
             if (eventId != null && processedEventRepository.existsById(eventId)) {
-                log.info("Evento duplicado ignorado: {}", eventId);
+                if (log.isInfoEnabled()) {
+                    log.info("Evento duplicado ignorado: {}", eventId);
+                }
                 return;
             }
 
@@ -75,9 +77,13 @@ public class CuentaEventHandler {
                 processedEventRepository.save(ReporteEntityMapper.toEntity(new ProcessedEvent(eventId, "CuentaCreadaEvent")));
             }
 
-            log.info("Cuenta procesada: {}", payload.getCuentaId());
+            if (log.isInfoEnabled()) {
+                log.info("Cuenta procesada: {}", payload.getCuentaId());
+            }
         } catch (Exception e) {
-            log.error("Error procesando evento CuentaCreadaEvent: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error procesando evento CuentaCreadaEvent: {}", e.getMessage());
+            }
             throw new RuntimeException(e);
         }
     }

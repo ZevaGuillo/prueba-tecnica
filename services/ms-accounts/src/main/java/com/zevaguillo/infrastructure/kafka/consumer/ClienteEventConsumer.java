@@ -27,7 +27,9 @@ public class ClienteEventConsumer {
 
     @KafkaListener(topics = "cliente-events", groupId = "ms-accounts-group")
     public void consume(String message) {
-        log.info("Recibido evento de cliente en ms-accounts: {}", message);
+        if (log.isInfoEnabled()) {
+            log.info("Recibido evento de cliente en ms-accounts: {}", message);
+        }
         try {
             JsonNode root = objectMapper.readTree(message);
 
@@ -47,10 +49,14 @@ public class ClienteEventConsumer {
                     LocalDateTime.now()
             );
             cachePersistencePort.upsert(cache);
-            log.info("Cliente sincronizado en cache: clienteId={}", clienteId);
+            if (log.isInfoEnabled()) {
+                log.info("Cliente sincronizado en cache: clienteId={}", clienteId);
+            }
 
         } catch (Exception e) {
-            log.error("Error procesando evento de cliente en cache: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error procesando evento de cliente en cache: {}", e.getMessage());
+            }
         }
     }
 

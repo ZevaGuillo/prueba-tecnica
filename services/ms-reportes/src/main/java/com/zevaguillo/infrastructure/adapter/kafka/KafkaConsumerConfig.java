@@ -27,31 +27,43 @@ public class KafkaConsumerConfig {
 
     @KafkaListener(topics = {"cliente-events"}, groupId = "ms-reportes-group")
     public void listenClienteEvents(String message) {
-        log.info("Recibido evento de cliente: {}", message);
+        if (log.isInfoEnabled()) {
+            log.info("Recibido evento de cliente: {}", message);
+        }
         try {
             clienteEventHandler.handle(message);
         } catch (Exception e) {
-            log.error("Error procesando evento de cliente: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error procesando evento de cliente: {}", e.getMessage());
+            }
         }
     }
 
     @KafkaListener(topics = {"cuenta-events", "cuenta-creada", "cuenta-actualizada"}, groupId = "ms-reportes-group")
     public void listenCuentaEvents(String message) {
-        log.info("Recibido evento de cuenta: {}", message);
+        if (log.isInfoEnabled()) {
+            log.info("Recibido evento de cuenta: {}", message);
+        }
         try {
             cuentaEventHandler.handle(message);
         } catch (Exception e) {
-            log.error("Error procesando evento de cuenta: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error procesando evento de cuenta: {}", e.getMessage());
+            }
         }
     }
 
     @KafkaListener(topics = {"movimiento-events", "movimiento-registrado"}, groupId = "ms-reportes-group")
     public void listenMovimientoEvents(String message) {
-        log.info("Recibido evento de movimiento: {}", message);
+        if (log.isInfoEnabled()) {
+            log.info("Recibido evento de movimiento: {}", message);
+        }
         try {
             movimientoEventHandler.handle(message);
         } catch (Exception e) {
-            log.error("Error procesando evento de movimiento: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error procesando evento de movimiento: {}", e.getMessage());
+            }
         }
     }
 }

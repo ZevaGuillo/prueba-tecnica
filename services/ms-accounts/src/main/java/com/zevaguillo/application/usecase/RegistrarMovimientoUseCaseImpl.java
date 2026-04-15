@@ -19,6 +19,8 @@ import java.util.UUID;
 @Service
 public class RegistrarMovimientoUseCaseImpl implements RegistrarMovimientoUseCase {
 
+    private static final String TIPO_RETIRO = "RETIRO";
+
     private final CuentaPersistencePort cuentaPersistencePort;
     private final MovimientoPersistencePort movimientoPersistencePort;
     private final OutboxEventPersistencePort outboxPort;
@@ -65,7 +67,7 @@ public class RegistrarMovimientoUseCaseImpl implements RegistrarMovimientoUseCas
         }
 
         Double nuevoSaldo;
-        if ("RETIRO".equals(movimiento.getTipoMovimiento())) {
+        if (TIPO_RETIRO.equals(movimiento.getTipoMovimiento())) {
             if (cuenta.getSaldo() + movimiento.getValor() < 0) {
                 throw new IllegalStateException("Saldo no disponible");
             }

@@ -48,12 +48,16 @@ public class ClienteEventHandler {
                 payload.setTelefono(root.path("telefono").asText(null));
                 if (eventId == null || eventId.isBlank()) {
                     String id = payload.getClienteId() != null ? payload.getClienteId() : payload.getIdentificacion();
-                    eventId = id != null ? "cliente-" + id : null;
+                    if (id != null) {
+                        eventId = "cliente-" + id;
+                    }
                 }
             }
 
             if (eventId != null && processedEventRepository.existsById(eventId)) {
-                log.info("Evento duplicado ignorado: {}", eventId);
+                if (log.isInfoEnabled()) {
+                    log.info("Evento duplicado ignorado: {}", eventId);
+                }
                 return;
             }
 
@@ -70,9 +74,13 @@ public class ClienteEventHandler {
                 processedEventRepository.save(ReporteEntityMapper.toEntity(new ProcessedEvent(eventId, "ClienteCreadoEvent")));
             }
 
-            log.info("Cliente procesado: {}", payload.getClienteId());
+            if (log.isInfoEnabled()) {
+                log.info("Cliente procesado: {}", payload.getClienteId());
+            }
         } catch (Exception e) {
-            log.error("Error procesando evento ClienteCreadoEvent: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error procesando evento ClienteCreadoEvent: {}", e.getMessage());
+            }
             throw new RuntimeException(e);
         }
     }

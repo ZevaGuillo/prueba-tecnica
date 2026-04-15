@@ -76,7 +76,9 @@ public class MovimientoEventHandler {
             }
 
             if (eventId != null && processedEventRepository.existsById(eventId)) {
-                log.info("Evento duplicado ignorado: {}", eventId);
+                if (log.isInfoEnabled()) {
+                    log.info("Evento duplicado ignorado: {}", eventId);
+                }
                 return;
             }
 
@@ -96,9 +98,13 @@ public class MovimientoEventHandler {
                 processedEventRepository.save(ReporteEntityMapper.toEntity(new ProcessedEvent(eventId, "MovimientoRegistradoEvent")));
             }
 
-            log.info("Movimiento procesado: {}", payload.getMovimientoId());
+            if (log.isInfoEnabled()) {
+                log.info("Movimiento procesado: {}", payload.getMovimientoId());
+            }
         } catch (Exception e) {
-            log.error("Error procesando evento MovimientoRegistradoEvent: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error procesando evento MovimientoRegistradoEvent: {}", e.getMessage());
+            }
             throw new RuntimeException(e);
         }
     }
