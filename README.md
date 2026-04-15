@@ -9,6 +9,7 @@ Sistema basado en microservicios para gestion de clientes, cuentas, movimientos 
 - Prerrequisitos
 - Levantar Todo Con Docker
 - Levantar Localmente (sin Docker para apps)
+- Coleccion Postman
 - Endpoints Por Servicio
 - Script End-To-End
 - Eventos Kafka
@@ -76,6 +77,7 @@ Consume eventos Kafka de los tres topics, persiste proyecciones en `reportes_sch
 │   ├── ms-accounts/
 │   └── ms-reportes/
 ├── docs/
+│   ├── Prueba tecnica - Banking.postman_collection.json
 │   ├── c4-context.md
 │   ├── c4-container.md
 │   ├── c4-component-ms-clients.md
@@ -152,6 +154,10 @@ curl -s http://localhost:8082/api/personas
 curl -s http://localhost:8081/api/cuentas
 curl -s "http://localhost:8080/api/reportes?clienteId=cli-001&fechaInicio=2026-01-01&fechaFin=2026-12-31&page=0&size=20"
 ```
+
+## Coleccion Postman
+
+> **Importante:** En `docs/` hay una coleccion lista para importar en Postman: [`docs/Prueba tecnica - Banking.postman_collection.json`](docs/Prueba%20tecnica%20-%20Banking.postman_collection.json). Agrupa las llamadas a los tres microservicios (puertos 8080, 8081, 8082) y sirve como referencia rapida ademas de los `curl` de este README. Tras importarla, revisa variables de entorno o la URL base si cambias puertos o usas otro host.
 
 ## Endpoints Por Servicio
 
