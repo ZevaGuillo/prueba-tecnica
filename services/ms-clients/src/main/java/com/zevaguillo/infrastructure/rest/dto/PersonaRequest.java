@@ -3,7 +3,6 @@ package com.zevaguillo.infrastructure.rest.dto;
 import com.zevaguillo.domain.model.Persona;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 
@@ -29,8 +28,9 @@ public class PersonaRequest {
     private String direccion;
     private String telefono;
 
-    public interface Create {}
-    public interface Update {}
+    public interface Create { }
+
+    public interface Update { }
     
     // Default constructor
     public PersonaRequest() {

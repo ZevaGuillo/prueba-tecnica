@@ -38,8 +38,9 @@ public class ClienteRequest {
     @Size(groups = Create.class, min = 6, message = "contrasena debe tener al menos 6 caracteres")
     private String contrasena;
 
-    public interface Create {}
-    public interface Update {}
+    public interface Create { }
+
+    public interface Update { }
     
     // Default constructor
     public ClienteRequest() {

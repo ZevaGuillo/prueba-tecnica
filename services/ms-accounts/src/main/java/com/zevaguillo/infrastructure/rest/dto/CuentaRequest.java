@@ -3,7 +3,6 @@ package com.zevaguillo.infrastructure.rest.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
-import jakarta.validation.groups.Default;
 
 public class CuentaRequest {
 
@@ -25,8 +24,9 @@ public class CuentaRequest {
     @NotBlank(groups = Create.class, message = "estado es requerido")
     private String estado;
 
-    public interface Create {}
-    public interface Update {}
+    public interface Create { }
+
+    public interface Update { }
 
     public String getCuentaId() {
         return cuentaId;

@@ -1,6 +1,9 @@
 package com.zevaguillo.infrastructure.persistence.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,15 +23,35 @@ public class ClienteCacheEntity {
     @Column(name = "synced_at", nullable = false)
     private LocalDateTime syncedAt;
 
-    public String getClienteId() { return clienteId; }
-    public void setClienteId(String clienteId) { this.clienteId = clienteId; }
+    public String getClienteId() {
+        return clienteId;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setClienteId(String clienteId) {
+        this.clienteId = clienteId;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    public LocalDateTime getSyncedAt() { return syncedAt; }
-    public void setSyncedAt(LocalDateTime syncedAt) { this.syncedAt = syncedAt; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public LocalDateTime getSyncedAt() {
+        return syncedAt;
+    }
+
+    public void setSyncedAt(LocalDateTime syncedAt) {
+        this.syncedAt = syncedAt;
+    }
 }

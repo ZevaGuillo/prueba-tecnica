@@ -1,6 +1,9 @@
 package com.zevaguillo.infrastructure.persistence.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -38,26 +41,86 @@ public class ReporteMovimientoEntity {
     @Column(name = "fecha_procesamiento", nullable = false)
     private LocalDateTime fechaProcesamiento;
 
-    public ReporteMovimientoEntity() {}
+    public ReporteMovimientoEntity() {
+    }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public String getMovimientoId() { return movimientoId; }
-    public void setMovimientoId(String movimientoId) { this.movimientoId = movimientoId; }
-    public String getCuentaId() { return cuentaId; }
-    public void setCuentaId(String cuentaId) { this.cuentaId = cuentaId; }
-    public String getClienteId() { return clienteId; }
-    public void setClienteId(String clienteId) { this.clienteId = clienteId; }
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
-    public BigDecimal getMonto() { return monto; }
-    public void setMonto(BigDecimal monto) { this.monto = monto; }
-    public BigDecimal getSaldoPosterior() { return saldoPosterior; }
-    public void setSaldoPosterior(BigDecimal saldoPosterior) { this.saldoPosterior = saldoPosterior; }
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
-    public LocalDateTime getFechaProcesamiento() { return fechaProcesamiento; }
-    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) { this.fechaProcesamiento = fechaProcesamiento; }
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getMovimientoId() {
+        return movimientoId;
+    }
+
+    public void setMovimientoId(String movimientoId) {
+        this.movimientoId = movimientoId;
+    }
+
+    public String getCuentaId() {
+        return cuentaId;
+    }
+
+    public void setCuentaId(String cuentaId) {
+        this.cuentaId = cuentaId;
+    }
+
+    public String getClienteId() {
+        return clienteId;
+    }
+
+    public void setClienteId(String clienteId) {
+        this.clienteId = clienteId;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public BigDecimal getSaldoPosterior() {
+        return saldoPosterior;
+    }
+
+    public void setSaldoPosterior(BigDecimal saldoPosterior) {
+        this.saldoPosterior = saldoPosterior;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public LocalDateTime getFechaProcesamiento() {
+        return fechaProcesamiento;
+    }
+
+    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) {
+        this.fechaProcesamiento = fechaProcesamiento;
+    }
 }

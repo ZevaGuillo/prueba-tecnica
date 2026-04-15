@@ -1,6 +1,9 @@
 package com.zevaguillo.infrastructure.persistence.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,12 +20,30 @@ public class ProcessedEventEntity {
     @Column(name = "fecha_procesamiento", nullable = false)
     private LocalDateTime fechaProcesamiento;
 
-    public ProcessedEventEntity() {}
+    public ProcessedEventEntity() {
+    }
 
-    public String getEventId() { return eventId; }
-    public void setEventId(String eventId) { this.eventId = eventId; }
-    public String getEventType() { return eventType; }
-    public void setEventType(String eventType) { this.eventType = eventType; }
-    public LocalDateTime getFechaProcesamiento() { return fechaProcesamiento; }
-    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) { this.fechaProcesamiento = fechaProcesamiento; }
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public LocalDateTime getFechaProcesamiento() {
+        return fechaProcesamiento;
+    }
+
+    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) {
+        this.fechaProcesamiento = fechaProcesamiento;
+    }
 }

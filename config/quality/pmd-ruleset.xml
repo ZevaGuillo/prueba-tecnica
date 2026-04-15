@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="basic-banking-ms"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+  <description>Reglas básicas PMD: error prone y buenas prácticas.</description>
+
+  <rule ref="category/java/errorprone.xml"/>
+  <rule ref="category/java/bestpractices.xml"/>
+</ruleset>

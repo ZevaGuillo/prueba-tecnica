@@ -24,8 +24,9 @@ public class MovimientoRequest {
     @Null(groups = Update.class, message = "transactionId no debe proporcionarse en actualización")
     private String transactionId;
 
-    public interface Create {}
-    public interface Update {}
+    public interface Create { }
+
+    public interface Update { }
 
     public String getMovimientoId() {
         return movimientoId;

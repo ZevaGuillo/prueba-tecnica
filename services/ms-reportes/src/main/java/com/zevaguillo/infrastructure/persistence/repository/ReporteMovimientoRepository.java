@@ -11,5 +11,10 @@ import java.util.UUID;
 
 @Repository
 public interface ReporteMovimientoRepository extends JpaRepository<ReporteMovimientoEntity, UUID> {
-    Page<ReporteMovimientoEntity> findByClienteIdAndFechaBetweenOrderByFechaDesc(String clienteId, LocalDateTime fechaInicio, LocalDateTime fechaFin, Pageable pageable);
+
+    Page<ReporteMovimientoEntity> findByClienteIdAndFechaBetweenOrderByFechaDesc(
+            String clienteId,
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin,
+            Pageable pageable);
 }

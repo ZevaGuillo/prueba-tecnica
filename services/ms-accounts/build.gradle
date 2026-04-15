@@ -1,7 +1,52 @@
 plugins {
     id 'java'
+    id 'jacoco'
+    id 'checkstyle'
+    id 'pmd'
     id 'org.springframework.boot' version '4.0.3'
     id 'io.spring.dependency-management' version '1.1.4'
+}
+
+def qualityConfigDir = file("${projectDir}/../../config/quality")
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+tasks.named('test') {
+    finalizedBy jacocoTestReport
+}
+
+checkstyle {
+    toolVersion = '10.21.0'
+    configFile = new File(qualityConfigDir, 'checkstyle.xml')
+}
+
+tasks.withType(Checkstyle).configureEach {
+    ignoreFailures = true
+}
+
+pmd {
+    toolVersion = '7.10.0'
+    ruleSets = []
+    ruleSetFiles = files(new File(qualityConfigDir, 'pmd-ruleset.xml'))
+    ignoreFailures = true
+}
+
+tasks.withType(Pmd).configureEach {
+    reports.configureEach { report ->
+        if (report.name != 'console') {
+            report.required = true
+        }
+    }
 }
 
 group = 'com.zevaguillo.banking'

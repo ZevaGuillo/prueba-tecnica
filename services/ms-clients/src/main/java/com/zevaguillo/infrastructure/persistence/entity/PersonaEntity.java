@@ -1,6 +1,9 @@
 package com.zevaguillo.infrastructure.persistence.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * PersonaEntity - JPA Entity for Persona

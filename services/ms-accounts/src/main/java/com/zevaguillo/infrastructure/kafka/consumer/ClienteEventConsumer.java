@@ -63,7 +63,9 @@ public class ClienteEventConsumer {
         JsonNode payload = root.path("payload");
         if (!payload.isMissingNode() && !payload.isNull()) {
             String value = payload.path(field).asText(null);
-            if (value != null && !value.isBlank()) return value;
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
         }
         String value = root.path(field).asText(null);
         return (value != null && !value.isBlank()) ? value : null;

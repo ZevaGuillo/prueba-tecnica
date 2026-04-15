@@ -16,10 +16,11 @@ public class ReporteMovimiento {
     private LocalDateTime fecha;
     private LocalDateTime fechaProcesamiento;
 
-    public ReporteMovimiento() {}
+    public ReporteMovimiento() {
+    }
 
-    public ReporteMovimiento(String movimientoId, String cuentaId, String clienteId, String tipo, 
-                          BigDecimal monto, BigDecimal saldoPosterior, String descripcion, LocalDateTime fecha) {
+    public ReporteMovimiento(String movimientoId, String cuentaId, String clienteId, String tipo,
+                             BigDecimal monto, BigDecimal saldoPosterior, String descripcion, LocalDateTime fecha) {
         this.id = UUID.randomUUID();
         this.movimientoId = movimientoId;
         this.cuentaId = cuentaId;
@@ -32,24 +33,83 @@ public class ReporteMovimiento {
         this.fechaProcesamiento = LocalDateTime.now();
     }
 
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public String getMovimientoId() { return movimientoId; }
-    public void setMovimientoId(String movimientoId) { this.movimientoId = movimientoId; }
-    public String getCuentaId() { return cuentaId; }
-    public void setCuentaId(String cuentaId) { this.cuentaId = cuentaId; }
-    public String getClienteId() { return clienteId; }
-    public void setClienteId(String clienteId) { this.clienteId = clienteId; }
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
-    public BigDecimal getMonto() { return monto; }
-    public void setMonto(BigDecimal monto) { this.monto = monto; }
-    public BigDecimal getSaldoPosterior() { return saldoPosterior; }
-    public void setSaldoPosterior(BigDecimal saldoPosterior) { this.saldoPosterior = saldoPosterior; }
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
-    public LocalDateTime getFechaProcesamiento() { return fechaProcesamiento; }
-    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) { this.fechaProcesamiento = fechaProcesamiento; }
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getMovimientoId() {
+        return movimientoId;
+    }
+
+    public void setMovimientoId(String movimientoId) {
+        this.movimientoId = movimientoId;
+    }
+
+    public String getCuentaId() {
+        return cuentaId;
+    }
+
+    public void setCuentaId(String cuentaId) {
+        this.cuentaId = cuentaId;
+    }
+
+    public String getClienteId() {
+        return clienteId;
+    }
+
+    public void setClienteId(String clienteId) {
+        this.clienteId = clienteId;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public BigDecimal getSaldoPosterior() {
+        return saldoPosterior;
+    }
+
+    public void setSaldoPosterior(BigDecimal saldoPosterior) {
+        this.saldoPosterior = saldoPosterior;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public LocalDateTime getFechaProcesamiento() {
+        return fechaProcesamiento;
+    }
+
+    public void setFechaProcesamiento(LocalDateTime fechaProcesamiento) {
+        this.fechaProcesamiento = fechaProcesamiento;
+    }
 }
