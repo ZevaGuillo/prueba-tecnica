@@ -13,34 +13,15 @@ jacoco {
     toolVersion = '0.8.12'
 }
 
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
-        html.required = true
-    }
-}
-
 tasks.named('test') {
     finalizedBy jacocoTestReport
-}
-
-jacocoTestCoverageVerification {
-    dependsOn test
-    violationRules {
-        rule {
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.16
-            }
-        }
-    }
 }
 
 tasks.named('check') {
     dependsOn jacocoTestCoverageVerification
 }
+
+apply from: file("${projectDir}/../../config/quality/jacoco.gradle")
 
 checkstyle {
     toolVersion = '10.21.0'

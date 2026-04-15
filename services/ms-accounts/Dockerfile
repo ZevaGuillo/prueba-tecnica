@@ -1,11 +1,13 @@
-# Multi-stage build: JAR Spring Boot del proyecto
+# Contexto de build: raíz del repo (compose: context .., dockerfile services/ms-accounts/Dockerfile).
+# Así projectDir/../../config/quality coincide con config/quality del monorepo (igual que en local).
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
-WORKDIR /app
+WORKDIR /workspace/services/ms-accounts
 
-COPY gradle/ gradle/
-COPY gradlew settings.gradle build.gradle ./
-COPY src/ src/
+COPY config/quality /workspace/config/quality
+COPY services/ms-accounts/gradle/ gradle/
+COPY services/ms-accounts/gradlew services/ms-accounts/settings.gradle services/ms-accounts/build.gradle ./
+COPY services/ms-accounts/src/ src/
 
 RUN chmod +x gradlew \
     && ./gradlew bootJar --no-daemon -x test \
@@ -15,7 +17,7 @@ RUN chmod +x gradlew \
          ls -la build/libs/ 2>&1 || ls -laR build/ 2>&1 || true; \
          exit 1; \
        fi \
-    && cp "$FJAR" /app/app.jar
+    && cp "$FJAR" /tmp/app.jar
 
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
@@ -25,7 +27,7 @@ RUN addgroup -g 1001 -S app && adduser -u 1001 -S app -G app
 
 WORKDIR /app
 
-COPY --from=builder /app/app.jar app.jar
+COPY --from=builder /tmp/app.jar app.jar
 
 RUN chown app:app app.jar
 

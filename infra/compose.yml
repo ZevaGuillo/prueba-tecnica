@@ -43,7 +43,9 @@ services:
     restart: "no"
 
   ms-accounts:
-    build: ../services/ms-accounts
+    build:
+      context: ..
+      dockerfile: services/ms-accounts/Dockerfile
     container_name: ms-accounts
     environment:
       SPRING_DATASOURCE_URL: ${ACCOUNTS_DB_URL:-jdbc:postgresql://postgres:5432/banking_db}
@@ -58,7 +60,9 @@ services:
       - kafka-init-topics
 
   ms-clients:
-    build: ../services/ms-clients
+    build:
+      context: ..
+      dockerfile: services/ms-clients/Dockerfile
     container_name: ms-clients
     environment:
       SPRING_DATASOURCE_URL: ${CLIENTS_DB_URL:-jdbc:postgresql://postgres:5432/banking_db}
@@ -73,7 +77,9 @@ services:
       - kafka-init-topics
 
   ms-reportes:
-    build: ../services/ms-reportes
+    build:
+      context: ..
+      dockerfile: services/ms-reportes/Dockerfile
     container_name: ms-reportes
     environment:
       SPRING_DATASOURCE_URL: ${REPORTES_DB_URL:-jdbc:postgresql://postgres:5432/banking_db}

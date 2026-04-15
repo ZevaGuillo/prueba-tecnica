@@ -1,0 +1,39 @@
+// JaCoCo: dominio + casos de uso. ms-reportes puede definir ext.jacocoExtraIncludes (handlers).
+
+afterEvaluate {
+    def patterns = [
+        'com/zevaguillo/domain/**/*.class',
+        'com/zevaguillo/application/usecase/**/*.class',
+        'com/zevaguillo/application/exception/**/*.class',
+    ]
+    if (ext.has('jacocoExtraIncludes')) {
+        patterns.addAll(jacocoExtraIncludes)
+    }
+
+    def coverageClassFiles = files(sourceSets.main.output.classesDirs.collect { classesDir ->
+        patterns.collect { pattern -> fileTree(dir: classesDir, includes: [pattern]) }
+    }.flatten())
+
+    tasks.named('jacocoTestReport', org.gradle.testing.jacoco.tasks.JacocoReport).configure {
+        dependsOn tasks.named('test')
+        reports {
+            xml.required = true
+            html.required = true
+        }
+        classDirectories.setFrom(coverageClassFiles)
+    }
+
+    tasks.named('jacocoTestCoverageVerification', org.gradle.testing.jacoco.tasks.JacocoCoverageVerification).configure {
+        dependsOn tasks.named('test')
+        violationRules {
+            rule {
+                limit {
+                    counter = 'LINE'
+                    value = 'COVEREDRATIO'
+                    minimum = 0.80
+                }
+            }
+        }
+        classDirectories.setFrom(coverageClassFiles)
+    }
+}

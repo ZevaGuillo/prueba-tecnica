@@ -1,14 +1,13 @@
-# Multi-stage build: JAR Spring Boot del proyecto
-# COPY explícito (no `COPY . .`) para no depender de un contexto vacío por .dockerignore demasiado amplio.
+# Contexto de build: raíz del repo (compose: context .., dockerfile services/ms-clients/Dockerfile).
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
-WORKDIR /app
+WORKDIR /workspace/services/ms-clients
 
-COPY gradle/ gradle/
-COPY gradlew settings.gradle build.gradle ./
-
-COPY src/ src/
-COPY test/ test/
+COPY config/quality /workspace/config/quality
+COPY services/ms-clients/gradle/ gradle/
+COPY services/ms-clients/gradlew services/ms-clients/settings.gradle services/ms-clients/build.gradle ./
+COPY services/ms-clients/src/ src/
+COPY services/ms-clients/test/ test/
 
 RUN chmod +x gradlew \
     && ./gradlew bootJar --no-daemon -x test \
@@ -18,7 +17,7 @@ RUN chmod +x gradlew \
          ls -la build/libs/ 2>&1 || ls -laR build/ 2>&1 || true; \
          exit 1; \
        fi \
-    && cp "$FJAR" /app/app.jar
+    && cp "$FJAR" /tmp/app.jar
 
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
@@ -28,7 +27,7 @@ RUN addgroup -g 1001 -S app && adduser -u 1001 -S app -G app
 
 WORKDIR /app
 
-COPY --from=builder /app/app.jar app.jar
+COPY --from=builder /tmp/app.jar app.jar
 
 RUN chown app:app app.jar
 

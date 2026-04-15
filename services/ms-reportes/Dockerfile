@@ -1,11 +1,12 @@
-# Multi-stage build: JAR Spring Boot del proyecto
+# Contexto de build: raíz del repo (compose: context .., dockerfile services/ms-reportes/Dockerfile).
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
-WORKDIR /app
+WORKDIR /workspace/services/ms-reportes
 
-COPY gradle/ gradle/
-COPY gradlew settings.gradle build.gradle ./
-COPY src/ src/
+COPY config/quality /workspace/config/quality
+COPY services/ms-reportes/gradle/ gradle/
+COPY services/ms-reportes/gradlew services/ms-reportes/settings.gradle services/ms-reportes/build.gradle ./
+COPY services/ms-reportes/src/ src/
 
 RUN chmod +x gradlew \
     && ./gradlew bootJar --no-daemon -x test \
@@ -15,7 +16,7 @@ RUN chmod +x gradlew \
          ls -la build/libs/ 2>&1 || ls -laR build/ 2>&1 || true; \
          exit 1; \
        fi \
-    && cp "$FJAR" /app/app.jar
+    && cp "$FJAR" /tmp/app.jar
 
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
@@ -25,7 +26,7 @@ RUN addgroup -g 1001 -S app && adduser -u 1001 -S app -G app
 
 WORKDIR /app
 
-COPY --from=builder /app/app.jar app.jar
+COPY --from=builder /tmp/app.jar app.jar
 
 RUN chown app:app app.jar
 
