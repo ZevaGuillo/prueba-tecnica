@@ -25,6 +25,23 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 
+jacocoTestCoverageVerification {
+    dependsOn test
+    violationRules {
+        rule {
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.16
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn jacocoTestCoverageVerification
+}
+
 checkstyle {
     toolVersion = '10.21.0'
     configFile = new File(qualityConfigDir, 'checkstyle.xml')
